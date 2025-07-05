@@ -1,0 +1,31 @@
+#cloud-config
+hostname: llama-lab
+timezone: Europe/Madrid
+package_update: true
+package_upgrade: true
+
+packages:
+  - curl
+  - git
+  - build-essential
+  - libssl-dev
+  - unzip
+  - python3
+  - python3-pip
+  - python-is-python3
+
+runcmd:
+  - curl -fsSL https://ollama.com/install.sh | sh
+  - systemctl enable ollama
+  - systemctl start ollama
+  - pip3 install --upgrade pip
+  - pip3 install ollama langchain requests
+
+  # Descarga el modelo llama3
+  - ollama pull llama3
+
+  # Crea el archivo de prueba
+  - echo 'from ollama import chat response = chat(model="llama3", messages=[{"role":"user", "content":"Hola, ¿qué sabes de Backstage?"}]) print(response["message"]["content"])' > /root/test_llama.py
+  - chmod +x /root/test_llama.py
+
+final_message: "🎉 Configuración finalizada. Ejecuta 'python3 /root/test_llama.py'"
